@@ -1,0 +1,20 @@
+a:link {
+    text-decoration: none;
+    color: gray
+}
+
+a:visited {
+    text-decoration: none;
+    color: gray;
+}
+
+.navbar-logo {
+    max-width: 50px;
+    max-height: 50px;
+    float: left;
+    margin-top: -13px;
+}
+
+.gifter-text  {
+  padding-left: 5px;
+}
