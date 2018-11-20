@@ -34,3 +34,18 @@
 p, h1, h2, h3, h4 {
   color: #343b4c;
 }
+
+.create-btn {
+  background-color: #bb8dd2;
+  border-color: #bb8dd2;
+  margin-top: 10px;
+}
+
+.create-btn:hover, .create-btn:active, .create-btn:hover:active, .create-btn:focus {
+  background-color: #9e76b3;;
+  border-color: #9e76b3;
+}
+
+.btn-danger {
+  float: left;
+}

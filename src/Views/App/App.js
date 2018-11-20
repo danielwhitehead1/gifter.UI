@@ -45,7 +45,9 @@ class App extends Component {
           isAuthenticated={this.state.isAuthenticated}
           userHasAuthenticated={this.userHasAuthenticated}
         />
-        <Routes childProps={childProps}/>
+        <div className="below_navbar">
+          <Routes childProps={childProps}/>
+        </div>
       </div>
     );
   }

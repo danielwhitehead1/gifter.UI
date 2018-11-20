@@ -18,7 +18,7 @@ Amplify.configure({
 	API: {
 		endpoints: [
 			{
-				name: 'testApiCall',
+				name: 'prod-gifter-api',
 				endpoint: config.apiGateway.URL,
 				region: config.apiGateway.REGION
 			}

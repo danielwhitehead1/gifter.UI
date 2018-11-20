@@ -17,6 +17,8 @@ export default class Signup extends Component {
       isLoading: false,
       email: "",
       password: "",
+      firstname: "",
+      surname: "",
       confirmPassword: "",
       confirmationCode: "",
       newUser: null
@@ -26,6 +28,8 @@ export default class Signup extends Component {
   validateForm() {
     return (
       this.state.email.length > 0 &&
+      this.state.firstname.length > 0 &&
+      this.state.surname.length > 0 &&
       this.state.password.length > 0 &&
       this.state.password === this.state.confirmPassword
     );
@@ -47,8 +51,12 @@ export default class Signup extends Component {
 
     try {
       const newUser = Auth.signUp({
-        username: this.state.email,
-        password: this.state.password
+        'username': this.state.email,
+        'password': this.state.password,
+        'attributes': {
+          'custom:firstname': this.state.firstname,
+          'custom:surname': this.state.surname 
+        }
       });
       this.setState({newUser: newUser});
     } catch(e) {
@@ -104,10 +112,26 @@ export default class Signup extends Component {
   renderForm() {
     return (
       <form onSubmit={this.handleSubmit}>
+      <FormGroup controlId="firstname" bsSize="large">
+          <ControlLabel>Firstname</ControlLabel>
+          <FormControl
+            autoFocus
+            type="text"
+            value={this.state.firstname}
+            onChange={this.handleChange}
+          />
+        </FormGroup>
+        <FormGroup controlId="surname" bsSize="large">
+          <ControlLabel>Surname</ControlLabel>
+          <FormControl
+            type="text"
+            value={this.state.surname}
+            onChange={this.handleChange}
+          />
+        </FormGroup>
         <FormGroup controlId="email" bsSize="large">
           <ControlLabel>Email</ControlLabel>
           <FormControl
-            autoFocus
             type="email"
             value={this.state.email}
             onChange={this.handleChange}
@@ -128,6 +152,7 @@ export default class Signup extends Component {
             onChange={this.handleChange}
             type="password"
           />
+          <HelpBlock>Password must contain at least one upper case, one symbolic and one numeric character.</HelpBlock>
         </FormGroup>
         <LoaderButton
           block

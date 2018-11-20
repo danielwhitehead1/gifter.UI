@@ -26,3 +26,5 @@ yarn-error.log*
 /amplify
 
 aws-exports.js
+rds_credentials.txt
+credentials.json

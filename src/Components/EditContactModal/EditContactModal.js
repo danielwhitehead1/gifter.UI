@@ -1,0 +1,241 @@
+import React, { Component } from 'react';
+import { Modal, Button, FormGroup, ControlLabel, FormControl, Form, InputGroup } from 'react-bootstrap';
+import LoaderButton from "../LoaderButton/LoaderButton";
+import { API } from 'aws-amplify';
+
+class EditContactModal extends Component {
+  constructor(props) {
+    super(props);
+    let contact = props.contact;
+    this.state = {
+      firstname: contact.firstname,
+      surname: contact.surname,
+      keywords: [],
+      currentKeyword: '',
+      selectedKeyword: '',
+      isLoading: false,
+      isDeleting: false
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if(this.props.contact !== prevProps.contact) {
+      let contact = this.props.contact;
+      this.setState({
+        firstname: contact.firstname,
+        surname: contact.surname,
+        keywords: contact.keywords,
+        currentKeyword: '',
+        selectedKeyword: '',
+        isLoading: false
+      });
+    }
+  }
+
+  closeModal = () => {
+    this.setState({
+      firstname: "",
+      surname: "",
+      currentKeyword: '',
+      selectedKeyword: '',
+      isLoading: false,
+      isDeleting: false,
+      keywords: []
+    })
+    this.props.onClose()
+  }
+
+  validateForm() {
+    return(
+      this.state.firstname.length > 0
+      && this.state.surname.length >0
+    );
+  }
+
+  getBody() {
+    return(
+      {
+        'body': {
+          'firstname': this.state.firstname,
+          'surname': this.state.surname
+          // 'keywords': this.state.keywords              MUST CHAGE TO ACCEPT KEYWORDS
+        }
+      }
+    )
+  }
+
+  createContact = () => {
+    this.setState({isLoading: true});
+    let reqBody = this.getBody();
+    API.post("prod-gifter-api", "/contacts", reqBody).then( response => {
+      this.props.updateContacts();
+      this.closeModal();
+      alert("Event created successfully")
+    }).catch(error => {
+      this.closeModal();
+      alert("Something went wrong")
+    });
+  }
+
+  updateContact = () => {
+    this.setState({isLoading: true});
+    let reqBody = this.getBody();
+    reqBody.body['id'] = this.props.contact.id;
+    API.put("prod-gifter-api", "/contacts", reqBody).then( response => {
+      this.props.updateContacts();
+      this.closeModal();
+      alert("Event updated successfully")
+    }).catch(error => {
+      this.closeModal();
+      alert("Something went wrong")
+    });
+  }
+
+  deleteContact = () => {
+    this.setState({isDeleting: true});
+    let reqBody = { 'body': { 'id': this.props.contact.id }}
+    API.del("prod-gifter-api", "/contacts", reqBody).then( response => {
+      this.props.updateContacts();
+      this.closeModal();
+      alert("Event deleted successfully")
+    }).catch(error => {
+      this.closeModal();
+      alert("Something went wrong")
+    });
+  }
+
+  handleChange = event => {
+    this.setState({
+      [event.target.id]: event.target.value
+    });
+  }
+
+  handleKeywordAdd = () => {
+    let newKeywords = this.state.keywords;
+    newKeywords.push(this.state.currentKeyword);
+    this.setState({keywords: newKeywords, currentKeyword: ''});
+  }
+
+  handleKeywordDelete = () => {
+    let newKeywords = this.state.keywords.map(function(keyword) {
+      return( this.state.selectedKeyword === keyword ? false : keyword)
+    }, this).filter(function(keyword) { return(!!keyword) })
+    this.setState({keywords: newKeywords});
+  }
+
+  createContactButtons() {
+    return(
+      <div>
+        <Button onClick={this.closeModal}>Close</Button>
+        <LoaderButton 
+          bsStyle="primary" 
+          isLoading={this.state.isLoading}
+          onClick={this.createContact}
+          text="Add contact"
+          loadingText="Adding..." 
+          disabled={!this.validateForm()}
+        />
+      </div>
+    )
+  }
+
+  updateContactButtons() {
+    return(
+      <div>
+        <LoaderButton 
+          bsStyle="danger" 
+          onClick={this.deleteContact}
+          isLoading={this.state.isDeleting}
+          text="Delete"
+          loadingText="Deleting..."
+        />
+        <Button onClick={this.closeModal}>Close</Button>
+        <LoaderButton 
+          disabled={!this.validateForm()} 
+          bsStyle="primary" 
+          onClick={this.updateContact}
+          isLoading={this.state.isLoading}
+          text="Update contact"
+          loadingText="Updating..."
+        />
+      </div>
+    )
+  }
+
+  addKeywordsField() {
+    return(
+      <FormGroup controlId="currentKeyword">
+        <ControlLabel>New Keyword</ControlLabel>
+        <InputGroup>
+          <FormControl
+            type="text"
+            onChange={this.handleChange}
+            value={this.state.currentKeyword}
+          />
+          <InputGroup.Button>
+            <Button onClick={this.handleKeywordAdd}>Add</Button>
+          </InputGroup.Button>
+        </InputGroup>
+      </FormGroup>
+    );
+  }
+
+  displayKeywordsField() {
+    return(
+      this.state.keywords.length > 0 ?
+      <FormGroup controlId="selectedKeyword">
+        <ControlLabel>Keywords</ControlLabel>
+        <InputGroup>
+          <FormControl 
+            componentClass="select" 
+            onChange={this.handleChange}
+            value={this.state.selectedKeyword}
+          >
+            {this.state.keywords.map(function(keyword, index) {
+              return(<option value={keyword} key={keyword + index}>{keyword}</option>)
+            })}
+          </FormControl>
+          <InputGroup.Button>
+            <Button onClick={this.handleKeywordDelete}>Delete</Button>
+          </InputGroup.Button>
+        </InputGroup>
+      </FormGroup>
+       : '');
+  }
+
+  render() {
+    return(
+      <Modal show={this.props.show}>
+      <Modal.Header>
+        {this.props.contact.firstname === "" ? "Create" : "Update Contact"}
+      </Modal.Header>
+      <Modal.Body>
+        <Form>
+          <FormGroup controlId="firstname" bsSize="large">
+            <ControlLabel>Firstname</ControlLabel>
+            <FormControl
+              type="text"
+              onChange={this.handleChange}
+              value={this.state.firstname}
+            />
+          </FormGroup>
+          <FormGroup controlId="surname" bsSize="large">
+            <ControlLabel>Surname</ControlLabel>
+            <FormControl
+              type="text"
+              onChange={this.handleChange}
+              value={this.state.surname}
+            />
+          </FormGroup>
+          {this.addKeywordsField()}
+          {this.displayKeywordsField()}
+        </Form>
+      </Modal.Body>
+      <Modal.Footer>
+        {this.props.contact.firstname === "" ? this.createContactButtons() : this.updateContactButtons()}
+      </Modal.Footer>
+      </Modal>
+    )
+  }
+}
+export default EditContactModal
