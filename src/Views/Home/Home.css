@@ -3,9 +3,16 @@
   margin-left: auto;
   margin-right: auto;
   width: 50%;
-  padding-top: 50px;
 }
 
 .centered-text {
   text-align: center;
+}
+
+.page-header h1 {
+  color: #a94442;
+}
+
+.page-header {
+  margin: 20px 0 20px;
 }

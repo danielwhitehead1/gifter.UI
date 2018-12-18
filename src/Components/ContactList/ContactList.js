@@ -31,7 +31,7 @@ class ContactList extends Component {
 
   renderListGroup(tab, sortedContacts) {
     return(
-      <ListGroup>
+      <ListGroup className="list-group-contacts">
         {sortedContacts[tab].map(function(contact) {
           return(
             <ListGroupItem 

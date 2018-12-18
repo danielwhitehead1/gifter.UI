@@ -36,16 +36,22 @@ p, h1, h2, h3, h4 {
 }
 
 .create-btn {
-  background-color: #bb8dd2;
-  border-color: #bb8dd2;
+  background-color: #a94442;
+  border-color: #a94442;
   margin-top: 10px;
 }
 
 .create-btn:hover, .create-btn:active, .create-btn:hover:active, .create-btn:focus {
-  background-color: #9e76b3;;
-  border-color: #9e76b3;
+  background-color: #a05654;;
+  border-color: #a05654;
 }
 
 .btn-danger {
   float: left;
+}
+
+@media only screen and (max-width: 600px) {
+  .below_navbar {
+    padding-top: 103px;
+  }  
 }

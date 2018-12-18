@@ -3,18 +3,17 @@
   min-height: 300px;
   height: 700px;
   margin-right: auto;
-  min-width: 600px;
   max-width: 1200px;
 }
 
 .rbc-event {
-  background-color: #bb8dd2;
+  background-color: #a94442;
 }
 
 .rbc-event.rbc-selected {
-  background-color: #ad6bce;
+  background-color: #a94442;
 }
 
 .rbc-day-slot .rbc-event {
-  border-color: #bb8dd2;
+  border-color: #a94442;
 }

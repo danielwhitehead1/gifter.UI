@@ -1,0 +1,5 @@
+.list-group-keywords {
+  max-height: 124px;
+  overflow: scroll;
+  overflow-x: hidden;
+}

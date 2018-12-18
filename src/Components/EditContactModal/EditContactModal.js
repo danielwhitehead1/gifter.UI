@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Modal, Button, FormGroup, ControlLabel, FormControl, Form, InputGroup } from 'react-bootstrap';
 import LoaderButton from "../LoaderButton/LoaderButton";
 import { API } from 'aws-amplify';
+import { getKeywords } from '../../lib/getKeywords-lib';
 
 class EditContactModal extends Component {
   constructor(props) {
@@ -18,13 +19,25 @@ class EditContactModal extends Component {
     }
   }
 
+  gotKeywordsCallback = (tags) => {
+    let keywords = Object.keys(tags).reduce(function (r, k) {
+      return r.concat(tags[k]['tag']);
+    }, []);
+
+    this.setState({
+      keywords: keywords
+    });
+  }
+
   componentDidUpdate(prevProps) {
     if(this.props.contact !== prevProps.contact) {
       let contact = this.props.contact;
+      if(contact.firstname !== '') {
+        getKeywords(contact.id, this.gotKeywordsCallback)
+      }
       this.setState({
         firstname: contact.firstname,
         surname: contact.surname,
-        keywords: contact.keywords,
         currentKeyword: '',
         selectedKeyword: '',
         isLoading: false
@@ -56,9 +69,11 @@ class EditContactModal extends Component {
     return(
       {
         'body': {
-          'firstname': this.state.firstname,
-          'surname': this.state.surname
-          // 'keywords': this.state.keywords              MUST CHAGE TO ACCEPT KEYWORDS
+          'contact': {
+            'firstname': this.state.firstname,
+            'surname': this.state.surname
+          },
+          'keywords': this.state.keywords
         }
       }
     )
@@ -70,7 +85,7 @@ class EditContactModal extends Component {
     API.post("prod-gifter-api", "/contacts", reqBody).then( response => {
       this.props.updateContacts();
       this.closeModal();
-      alert("Event created successfully")
+      alert("Contact created successfully")
     }).catch(error => {
       this.closeModal();
       alert("Something went wrong")
@@ -80,11 +95,11 @@ class EditContactModal extends Component {
   updateContact = () => {
     this.setState({isLoading: true});
     let reqBody = this.getBody();
-    reqBody.body['id'] = this.props.contact.id;
+    reqBody.body.contact['id'] = this.props.contact.id;
     API.put("prod-gifter-api", "/contacts", reqBody).then( response => {
       this.props.updateContacts();
       this.closeModal();
-      alert("Event updated successfully")
+      alert("Contact updated successfully")
     }).catch(error => {
       this.closeModal();
       alert("Something went wrong")
@@ -97,7 +112,7 @@ class EditContactModal extends Component {
     API.del("prod-gifter-api", "/contacts", reqBody).then( response => {
       this.props.updateContacts();
       this.closeModal();
-      alert("Event deleted successfully")
+      alert("Contact deleted successfully")
     }).catch(error => {
       this.closeModal();
       alert("Something went wrong")

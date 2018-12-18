@@ -3,10 +3,13 @@ import logo from './../../Icons/logo_transparent.png';
 import MyCalendar from './../../Components/MyCalendar/MyCalendar';
 import EventModal from './../../Components/EventModal/EventModal';
 import EditEventModal from './../../Components/EditEventModal/EditEventModal';
+import UpcomingEvents from './../../Components/UpcomingEvents/UpcomingEvents';
 import { Button } from 'react-bootstrap';
 import { API, Auth } from 'aws-amplify';
 
 import './Home.css';
+
+let futureEventsIndex = Number.MAX_SAFE_INTEGER;
 
 class Home extends Component {
   constructor(props) {
@@ -48,9 +51,11 @@ class Home extends Component {
       alert(e);
     }
     let hashedContacts = {};
-    contacts.map(function(contact) {
-      hashedContacts[contact.id] = contact;
-    })
+    if(contacts) {
+      contacts.map(function(contact) {
+        return(hashedContacts[contact.id] = contact);
+      })
+    }
     this.setState({ 
       contacts: contacts,
       hashedContacts: hashedContacts
@@ -67,7 +72,25 @@ class Home extends Component {
     } catch (e) {
       alert(e);
     }
+    events = this.buildEvents(events)
     this.setState({ events: events });
+  }
+
+  buildEvents(events) {
+    let currentDate = new Date();
+    if(events) {
+      events.map(function(event,i) {
+        event.start = new Date(event.start);
+        event.end = new Date(event.end);
+        event.allDay = !!event.allDayEvent;
+        futureEventsIndex = event.start >= currentDate && futureEventsIndex === Number.MAX_SAFE_INTEGER ? i : futureEventsIndex
+        return(event);
+      })
+      events.sort(function(a,b) {
+        return a.start < b.start ? -1 : a.start > b.start ? 1 : 0;
+      });
+    }
+    return(events);
   }
 
   eventClick = (event) => {
@@ -118,6 +141,9 @@ class Home extends Component {
   userCalendarPage() {
     return(
       <div>
+        <UpcomingEvents 
+          events={this.state.events ? this.state.events.slice(futureEventsIndex,futureEventsIndex + 4) : []} 
+          onClick={this.eventClick}/>
         <MyCalendar 
           eventClick = {this.eventClick} events={this.state.events || []}
         />
