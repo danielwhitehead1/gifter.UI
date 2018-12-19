@@ -5,7 +5,7 @@ export function getKeywords(contactId, callback) {
     let reqBody = {'queryStringParameters': { 'contactId': contactId }}
     Auth.currentAuthenticatedUser()
     .then(() => {
-      API.get("prod-gifter-api", "/tags", reqBody).then((tags) => callback(tags));
+      API.get("prod-gifter-api", "/tags", reqBody).then(callback);
     })
     .catch(err => console.log(err));
   } catch (e) {

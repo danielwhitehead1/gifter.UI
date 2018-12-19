@@ -25,13 +25,15 @@ class EditContactModal extends Component {
     }, []);
 
     this.setState({
-      keywords: keywords
+      keywords: keywords,
+      selectedKeyword: keywords[0]
     });
   }
 
   componentDidUpdate(prevProps) {
     if(this.props.contact !== prevProps.contact) {
       let contact = this.props.contact;
+      debugger;
       if(contact.firstname !== '') {
         getKeywords(contact.id, this.gotKeywordsCallback)
       }
@@ -135,7 +137,7 @@ class EditContactModal extends Component {
     let newKeywords = this.state.keywords.map(function(keyword) {
       return( this.state.selectedKeyword === keyword ? false : keyword)
     }, this).filter(function(keyword) { return(!!keyword) })
-    this.setState({keywords: newKeywords});
+    this.setState({keywords: newKeywords, selectedKeyword: newKeywords[0]});
   }
 
   createContactButtons() {

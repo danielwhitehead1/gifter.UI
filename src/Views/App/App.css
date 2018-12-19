@@ -39,6 +39,7 @@ p, h1, h2, h3, h4 {
   background-color: #a94442;
   border-color: #a94442;
   margin-top: 10px;
+  margin-bottom: 30px;
 }
 
 .create-btn:hover, .create-btn:active, .create-btn:hover:active, .create-btn:focus {
@@ -54,4 +55,9 @@ p, h1, h2, h3, h4 {
   .below_navbar {
     padding-top: 103px;
   }  
+}
+
+.loading-icon {
+  margin-left: auto;
+  margin-right: auto;
 }

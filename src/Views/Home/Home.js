@@ -5,7 +5,10 @@ import EventModal from './../../Components/EventModal/EventModal';
 import EditEventModal from './../../Components/EditEventModal/EditEventModal';
 import UpcomingEvents from './../../Components/UpcomingEvents/UpcomingEvents';
 import { Button } from 'react-bootstrap';
-import { API, Auth } from 'aws-amplify';
+import LoadingIcon from './../../Components/LoadingIcon/LoadingIcon';
+
+import { getContacts } from '../../lib/getContacts-lib';
+import { getEvents } from './../../lib/getEvents-lib';
 
 import './Home.css';
 
@@ -17,16 +20,17 @@ class Home extends Component {
     this.state = {
       eventModalOpen: false,
       currentEvent: this.blankEvent(),
-      editEventModalOpen: false
+      editEventModalOpen: false,
+      loadingEvents: true,
+      loadingContacts: true
     }
 
     this.onEditEventModalClose = this.onEditEventModalClose.bind(this);
-    this.getEvents = this.getEvents.bind(this);
   }
   
   componentDidMount() {
-    this.getEvents();
-    this.getContacts();
+    getEvents(this.gotEventsCallback);
+    getContacts(this.gotContactsCallback);
   }
 
   logoPage() {
@@ -40,16 +44,7 @@ class Home extends Component {
     );
   }
 
-  async getContacts() {
-    try {
-      var contacts = await Auth.currentAuthenticatedUser()
-      .then(async () => {   
-        return await API.get("prod-gifter-api", "/contacts");
-      })
-      .catch(err => console.log(err));
-    } catch (e) {
-      alert(e);
-    }
+  gotContactsCallback = (contacts) => {
     let hashedContacts = {};
     if(contacts) {
       contacts.map(function(contact) {
@@ -58,22 +53,14 @@ class Home extends Component {
     }
     this.setState({ 
       contacts: contacts,
-      hashedContacts: hashedContacts
+      hashedContacts: hashedContacts,
+      loadingContacts: false
     });
   }
 
-  async getEvents() {
-    try {
-      var events = await Auth.currentAuthenticatedUser()
-      .then(async () => {   
-        return await API.get("prod-gifter-api", "/events");
-      })
-      .catch(err => console.log(err));
-    } catch (e) {
-      alert(e);
-    }
+  gotEventsCallback = (events) => {
     events = this.buildEvents(events)
-    this.setState({ events: events });
+    this.setState({ events: events, loadingEvents: false });
   }
 
   buildEvents(events) {
@@ -120,7 +107,7 @@ class Home extends Component {
   }
   
   updateCalendar = () => {
-    this.getEvents();
+    getEvents();
   }
 
   blankEvent() {
@@ -175,7 +162,15 @@ class Home extends Component {
 
   rednerHomePage() {
     if(this.props.isAuthenticated) {
-      return(this.userCalendarPage());
+      return(<div>
+        { 
+          (this.state.loadingContacts || this.state.loadingEvents) ? 
+            <LoadingIcon />
+          : 
+            this.userCalendarPage()
+        }
+        </div>
+        );
     }
     else {
       return(this.logoPage());

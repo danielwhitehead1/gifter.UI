@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import ContactList from './../../Components/ContactList/ContactList';
 import EditContactModal from './../../Components/EditContactModal/EditContactModal';
 import ContactModal from './../../Components/ContactModal/ContactModal';
-import { Auth, API } from 'aws-amplify';
 import { Button } from 'react-bootstrap';
+import { getContacts } from './../../lib/getContacts-lib';
+import LoadingIcon from './../../Components/LoadingIcon/LoadingIcon';
 import "./Contacts.css";
 
 class Contacts extends Component {
@@ -13,25 +14,17 @@ class Contacts extends Component {
       editContactModalOpen: false,
       contactModalOpen: false,
       currentContact: this.blankContact(),
-      contacts: []
+      contacts: [],
+      contactsLoading: true
     }
   }
 
   componentDidMount() {
-    this.getContacts();
+    getContacts(this.onGotContactsCallback);
   }
 
-  async getContacts() {
-    try {
-      var contacts = await Auth.currentAuthenticatedUser()
-      .then(async () => {   
-        return await API.get("prod-gifter-api", "/contacts");
-      })
-      .catch(err => console.log(err));
-    } catch (e) {
-      alert(e);
-    }
-    this.setState({ contacts: contacts });
+  onGotContactsCallback = (contacts) => {
+    this.setState({ contacts: contacts, contactsLoading: false });
   }
 
   blankContact() {
@@ -83,9 +76,16 @@ class Contacts extends Component {
   render() {
     return(
       <div className="centered-content">
-        <ContactList 
-          contacts={this.state.contacts || []}
-          contactClick={this.contactClick}/>
+        {
+          this.state.contactsLoading ?
+          <LoadingIcon />
+          :
+
+          <ContactList 
+            contacts={this.state.contacts || []}
+            contactClick={this.contactClick}
+            />
+        }
         <EditContactModal 
           show={this.state.editContactModalOpen} 
           onClose={this.onCloseEdit} 

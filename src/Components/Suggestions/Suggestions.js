@@ -1,24 +1,25 @@
 import React, { Component } from 'react';
 import { Button } from 'react-bootstrap';
 import Suggestion from './../Suggestion/Suggestion';
+import LoadingIcon from './../../Components/LoadingIcon/LoadingIcon';
 
 import { getNewSuggestion, getSuggestions, addSuggestion, removeSuggestion } from '../../lib/suggestions-lib';
 
 class Suggestions extends Component {
   constructor(props) {
     super(props);
-    this.state ={
-      suggestions: []
+    this.state = {
+      suggestions: [],
+      suggestionsLoading: true
     }
   }
 
-  async componentDidMount() {
-    let id = this.props.contactId;
-    getSuggestions(id, this.onGotSuggestionsCallback);
+  componentDidMount() {
+    getSuggestions(this.props.contactId, this.onGotSuggestionsCallback);
   }
 
   onGotSuggestionsCallback = (result) => {
-    this.setState({suggestions: result});
+    this.setState({suggestions: result, suggestionsLoading: false});
   }
 
   formatSuggestion(suggestion) {
@@ -73,18 +74,30 @@ class Suggestions extends Component {
     this.setState({suggestions: newItems});
   }
 
-  render() {
+  renderSuggestions() {
     return(
       <div>
         { this.state.suggestions.map(function(item, index) {
-              return(
-                <Suggestion 
-                  key={index}
-                  title={item.title} 
-                  id={item.itemId}
-                  url={item.url}
-                  removeSuggestion={this.removeSuggestion}/>)
-            }, this) }
+          return(<Suggestion 
+            key={index}
+            title={item.title} 
+            id={item.itemId}
+            url={item.url}
+            removeSuggestion={this.removeSuggestion}/>);
+        }, this) }
+      </div>
+    );
+  }
+
+  render() {
+    return(
+      <div>
+        {
+          this.state.suggestionsLoading ?
+            <LoadingIcon />
+          :
+            this.renderSuggestions()
+        }
         { this.props.keywords ?
           <div>
             <Button onClick={this.onClick}>Add Suggestion</Button>
