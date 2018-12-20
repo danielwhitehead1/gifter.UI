@@ -1,4 +1,5 @@
 import { API, Auth } from 'aws-amplify';
+import { postAPI, getAPI } from './apiCall-lib';
 import config from './../config';
 
 const jsonp = require("jsonp");
@@ -6,28 +7,7 @@ const jsonp = require("jsonp");
 export function getNewSuggestion(keywords, callback) {
   let keywordsString = keywords.join(" ");
   let reqBody = {'queryStringParameters': { 'keywords': keywordsString }};
-  try {
-    Auth.currentAuthenticatedUser()
-    .then(() => {
-      API.get("prod-gifter-api", "/keywords", reqBody).then((result) => callEtsyApi(result, callback));
-    })
-    .catch(err => console.log(err));
-  } catch (e) {
-    alert(e);
-  }
-}
-
-export function getSuggestions(id, callback) {
-  let reqBody = {'queryStringParameters': { 'contactId': id }}
-  try {
-    Auth.currentAuthenticatedUser()
-    .then(() => {
-      API.get("prod-gifter-api", "/suggestions", reqBody).then(callback);
-    })
-    .catch(err => console.log(err));
-  } catch (e) {
-    alert(e);
-  }
+  getAPI('keywords', (result) => callEbayApi(result, callback), reqBody);
 }
 
 export function addSuggestion(item, contactId) {
@@ -36,25 +16,19 @@ export function addSuggestion(item, contactId) {
       'title': item.title,
       'url': item.url,
       'contactId': contactId,
-      'itemId': parseInt(item.itemId)
+      'itemId': parseInt(item.itemId),
+      'source': item.source
     }
   }
-  try {
-    Auth.currentAuthenticatedUser()
-    .then(() => {
-      API.post("prod-gifter-api", "/suggestions", body);
-    })
-    .catch(err => console.log(err));
-  } catch (e) {
-    alert(e);
-  }
+  postAPI('suggestions', body);
 }
 
-export function removeSuggestion(id, contactId) {
+export function removeSuggestion(id, contactId, source) {
   let body = {
     'body': {
       'itemId': id,
-      'contactId': contactId
+      'contactId': contactId,
+      'source': source
     }
   }
   try {

@@ -3,7 +3,7 @@ import ContactList from './../../Components/ContactList/ContactList';
 import EditContactModal from './../../Components/EditContactModal/EditContactModal';
 import ContactModal from './../../Components/ContactModal/ContactModal';
 import { Button } from 'react-bootstrap';
-import { getContacts } from './../../lib/getContacts-lib';
+import { getAPI } from './../../lib/apiCall-lib';
 import LoadingIcon from './../../Components/LoadingIcon/LoadingIcon';
 import "./Contacts.css";
 
@@ -20,7 +20,7 @@ class Contacts extends Component {
   }
 
   componentDidMount() {
-    getContacts(this.onGotContactsCallback);
+    getAPI('contacts', this.onGotContactsCallback);
   }
 
   onGotContactsCallback = (contacts) => {
@@ -38,7 +38,7 @@ class Contacts extends Component {
   }
 
   updateContacts = () => {
-    this.getContacts();
+    getAPI('contacts', this.onGotContactsCallback);
   }
 
   addContact = () => {

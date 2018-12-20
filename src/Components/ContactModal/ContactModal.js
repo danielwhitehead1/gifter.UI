@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, Button, Form, ControlLabel, FormGroup, ListGroup, ListGroupItem } from 'react-bootstrap';
 import Suggestions from './../Suggestions/Suggestions';
-import { getKeywords } from '../../lib/getKeywords-lib';
+import { getAPI } from '../../lib/apiCall-lib';
 import LoadingIcon from './../../Components/LoadingIcon/LoadingIcon';
 
 import './ContactModal.css'
@@ -23,7 +23,8 @@ class ContactModal extends Component {
     let contact = this.props.contact;
     if(contact !== prevProps.contact) {
       if(contact.firstname !== '') {
-        getKeywords(contact.id, this.gotKeywordsCallback);
+        let body = {'queryStringParameters': { 'contactId': contact.id }}
+        getAPI('tags', this.gotKeywordsCallback, body);
       }
       this.setState({keywords: []});
     }

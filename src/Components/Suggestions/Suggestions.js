@@ -3,7 +3,8 @@ import { Button } from 'react-bootstrap';
 import Suggestion from './../Suggestion/Suggestion';
 import LoadingIcon from './../../Components/LoadingIcon/LoadingIcon';
 
-import { getNewSuggestion, getSuggestions, addSuggestion, removeSuggestion } from '../../lib/suggestions-lib';
+import { addSuggestion, removeSuggestion, getNewSuggestion } from '../../lib/suggestions-lib';
+import { getAPI } from './../../lib/apiCall-lib';
 
 class Suggestions extends Component {
   constructor(props) {
@@ -15,25 +16,35 @@ class Suggestions extends Component {
   }
 
   componentDidMount() {
-    getSuggestions(this.props.contactId, this.onGotSuggestionsCallback);
+    let reqBody = {'queryStringParameters': { 'contactId': this.props.contactId }};
+    getAPI('suggestions', this.onGotSuggestionsCallback, reqBody);
   }
 
   onGotSuggestionsCallback = (result) => {
     this.setState({suggestions: result, suggestionsLoading: false});
   }
 
-  formatSuggestion(suggestion) {
+  formatSuggestion(title, url, id, source) {
     return({
-      'title': suggestion.title,
-      'url': suggestion.viewItemURL[0],
-      'itemId': suggestion.itemId[0]
+      'title': title,
+      'url': url,
+      'itemId': id,
+      'source': source
     })
   }
 
+  addItem(item) {
+    let items = this.state.suggestions;
+    items.push(item);
+    this.setState({suggestions: items});
+    addSuggestion(item, this.props.contactId);
+  }
+
   onSuggestionReturnCallbackEtsy = (err, data) => {
-    debugger;
     if(data.ok) {
-      debugger;
+      var item = data.results[0] || [];
+      item = this.formatSuggestion(item.title, item.url, item.listing_id, 'etsy')
+      this.addItem(item);
     } else {
       console.log(data);
     }
@@ -43,12 +54,10 @@ class Suggestions extends Component {
     if(!err) {
       if(data.findItemsByKeywordsResponse[0].searchResult[0].item) {
         var item = data.findItemsByKeywordsResponse[0].searchResult[0].item[0] || [];
-        let items = this.state.suggestions;
-        item = this.formatSuggestion(item);
-        items.push(item);
-        this.setState({suggestions: items});
-        addSuggestion(item, this.props.contactId);
+        item = this.formatSuggestion(item.title, item.viewItemURL[0], item.itemId[0], 'ebay');
+        this.addItem(item);
       } else {
+        let reqBody = {'queryStringParameters': { 'keywords': this.props.keywords.join(" ") }};
         getNewSuggestion(this.props.keywords, this.onSuggestionReturnCallbackEbay);
       }
       // add suggestion to db
@@ -67,7 +76,7 @@ class Suggestions extends Component {
   }
 
   onClick = () => {
-    getNewSuggestion(this.props.keywords, this.onSuggestionReturnCallbackEtsy);
+    getNewSuggestion(this.props.keywords, this.onSuggestionReturnCallbackEbay);
   }
 
   removeSuggestion = (id) => {
@@ -79,7 +88,7 @@ class Suggestions extends Component {
       }
     });
     // Remove suggestion from db
-    removeSuggestion(id, this.props.contactId)
+    removeSuggestion(id, this.props.contactId, this.props.source)
     this.setState({suggestions: newItems});
   }
 
@@ -92,6 +101,7 @@ class Suggestions extends Component {
             title={item.title} 
             id={item.itemId}
             url={item.url}
+            source ={item.source}
             removeSuggestion={this.removeSuggestion}/>);
         }, this) }
       </div>

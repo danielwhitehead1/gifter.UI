@@ -7,8 +7,7 @@ import UpcomingEvents from './../../Components/UpcomingEvents/UpcomingEvents';
 import { Button } from 'react-bootstrap';
 import LoadingIcon from './../../Components/LoadingIcon/LoadingIcon';
 
-import { getContacts } from '../../lib/getContacts-lib';
-import { getEvents } from './../../lib/getEvents-lib';
+import { getAPI } from '../../lib/apiCall-lib';
 
 import './Home.css';
 
@@ -29,8 +28,8 @@ class Home extends Component {
   }
   
   componentDidMount() {
-    getEvents(this.gotEventsCallback);
-    getContacts(this.gotContactsCallback);
+    getAPI('events', this.gotEventsCallback);
+    getAPI('contacts', this.gotContactsCallback);
   }
 
   logoPage() {
@@ -107,7 +106,7 @@ class Home extends Component {
   }
   
   updateCalendar = () => {
-    getEvents();
+    getAPI('events', this.gotEventsCallback);
   }
 
   blankEvent() {

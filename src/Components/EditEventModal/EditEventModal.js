@@ -4,6 +4,7 @@ import LoaderButton from "../LoaderButton/LoaderButton";
 import DateTime from 'react-datetime';
 import { API } from 'aws-amplify';
 import Select from 'react-select';
+import { postAPI, updateAPI } from './../../lib/apiCall-lib';
 
 import 'react-datetime/css/react-datetime.css';
 import './EditEventModal.css';
@@ -143,31 +144,29 @@ class EditEventModal extends Component {
     }
   }
 
+  eventSuccesCallback = () => {
+    debugger;
+    this.props.updateCalendar();
+    this.closeModal();
+    alert("Success");
+  }
+
+  eventErrorCallback = () => {
+    this.closeModal();
+    alert("Something went wrong");
+  }
+
   createEvent() {
     this.setState({isLoading: true});
     let reqBody = this.getBody();
-    API.post("prod-gifter-api", "/events", reqBody).then( response => {
-      this.props.updateCalendar();
-      this.closeModal();
-      alert("Event created successfully")
-    }).catch(error => {
-      this.closeModal();
-      alert("Something went wrong")
-    });
+    postAPI('events', reqBody, this.eventSuccesCallback, this.eventErrorCallback)
   }
 
   updateEvent() {
     this.setState({isLoading: true});
     let reqBody = this.getBody();
     reqBody.body['id'] = this.props.event.id;
-    API.put("prod-gifter-api", "/events", reqBody).then( response => {
-      this.props.updateCalendar();
-      this.closeModal();
-      alert("Event updated successfully")
-    }).catch(error => {
-      this.closeModal();
-      alert("Something went wrong")
-    });
+    updateAPI('events', reqBody, this.eventSuccesCallback, this.eventErrorCallback);
   }
 
   deleteEvent() {
