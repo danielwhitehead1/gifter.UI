@@ -9,7 +9,7 @@ export function getNewSuggestion(keywords, callback) {
   try {
     Auth.currentAuthenticatedUser()
     .then(() => {
-      API.get("prod-gifter-api", "/keywords", reqBody).then((result) => callEbayApi(result, callback));
+      API.get("prod-gifter-api", "/keywords", reqBody).then((result) => callEtsyApi(result, callback));
     })
     .catch(err => console.log(err));
   } catch (e) {
@@ -66,6 +66,13 @@ export function removeSuggestion(id, contactId) {
   } catch (e) {
     alert(e);
   }
+}
+
+function callEtsyApi(keywords, callback) {
+  var url = "https://openapi.etsy.com/v2/listings/active.js?api_key=6odgex425apdv9mxokh836e5";
+      url += '&limit=1';
+      url += `&keywords=${keywords}`;
+  jsonp(url, callback);
 }
 
 function callEbayApi(keywords, callback) {

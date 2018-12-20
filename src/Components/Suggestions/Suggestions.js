@@ -30,7 +30,16 @@ class Suggestions extends Component {
     })
   }
 
-  onSuggestionReturnCallback = (err, data) => {
+  onSuggestionReturnCallbackEtsy = (err, data) => {
+    debugger;
+    if(data.ok) {
+      debugger;
+    } else {
+      console.log(data);
+    }
+  }
+
+  onSuggestionReturnCallbackEbay = (err, data) => {
     if(!err) {
       if(data.findItemsByKeywordsResponse[0].searchResult[0].item) {
         var item = data.findItemsByKeywordsResponse[0].searchResult[0].item[0] || [];
@@ -40,7 +49,7 @@ class Suggestions extends Component {
         this.setState({suggestions: items});
         addSuggestion(item, this.props.contactId);
       } else {
-        getNewSuggestion(this.props.keywords, this.onSuggestionReturnCallback);
+        getNewSuggestion(this.props.keywords, this.onSuggestionReturnCallbackEbay);
       }
       // add suggestion to db
       /*
@@ -58,7 +67,7 @@ class Suggestions extends Component {
   }
 
   onClick = () => {
-    getNewSuggestion(this.props.keywords, this.onSuggestionReturnCallback);
+    getNewSuggestion(this.props.keywords, this.onSuggestionReturnCallbackEtsy);
   }
 
   removeSuggestion = (id) => {

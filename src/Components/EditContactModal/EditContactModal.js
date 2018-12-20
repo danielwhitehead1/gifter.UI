@@ -33,7 +33,6 @@ class EditContactModal extends Component {
   componentDidUpdate(prevProps) {
     if(this.props.contact !== prevProps.contact) {
       let contact = this.props.contact;
-      debugger;
       if(contact.firstname !== '') {
         getKeywords(contact.id, this.gotKeywordsCallback)
       }
