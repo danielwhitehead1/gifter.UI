@@ -31,13 +31,13 @@
   }
 }
 
-p, h1, h2, h3, h4 {
+p, h1, h2, h3, h4, a {
   color: #343b4c;
 }
 
 .create-btn {
-  background-color: #a94442;
-  border-color: #a94442;
+  background-color: #CD6155;
+  border-color: #CD6155;
   margin-top: 10px;
   margin-bottom: 30px;
 }
@@ -54,7 +54,11 @@ p, h1, h2, h3, h4 {
 @media only screen and (max-width: 600px) {
   .below_navbar {
     padding-top: 103px;
-  }  
+  }
+
+  .no_navbar {
+    margin-top: -103px;
+  }
 }
 
 .loading-icon {

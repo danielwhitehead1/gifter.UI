@@ -145,7 +145,6 @@ class EditEventModal extends Component {
   }
 
   eventSuccesCallback = () => {
-    debugger;
     this.props.updateCalendar();
     this.closeModal();
     alert("Success");

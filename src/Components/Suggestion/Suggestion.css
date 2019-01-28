@@ -7,3 +7,15 @@
 .remove-btn {
   float: right;
 }
+
+.favourite-btn {
+  background-color: transparent;
+  border: none;
+  float: right;
+  margin-right: 5px;
+}
+
+.star-img {
+  width: 30px;
+  height: 30px;
+}

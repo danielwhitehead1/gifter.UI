@@ -1,0 +1,51 @@
+.jumbotron h1 {
+  text-align: center;
+}
+
+.welcome-txt {
+  background-color: transparent;
+}
+
+.parallax {
+  /* Set a specific height */
+  height: 400px; 
+
+  /* Create the parallax scrolling effect */
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.first { 
+  background-image: url('./../../Icons/dark_gift_in_hand.jpg');
+}
+
+.second { 
+  background-image: url('./../../Icons/dark_present_leaves.jpg');
+}
+
+.third {
+  background-image: url('./../../Icons/dark_advent_crafts.jpg'); 
+}
+
+.centered-btns {
+  margin-left: auto;
+  margin-right: auto;
+  width: 230px;
+}
+
+.centered-btns a {
+  font-size: x-large;
+  border: none;
+  background-color: antique-white;
+}
+
+.right-btn {
+  float: right;
+}
+
+.landing-text {
+  background-color: white;
+  text-align: center;
+}

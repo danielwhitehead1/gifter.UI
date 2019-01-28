@@ -1,11 +1,9 @@
 a:link {
     text-decoration: none;
-    color: gray
 }
 
 a:visited {
     text-decoration: none;
-    color: gray;
 }
 
 .navbar-logo {
@@ -17,4 +15,22 @@ a:visited {
 
 .gifter-text  {
   padding-left: 5px;
+}
+
+.calendar-btn {
+  background-size: contain;
+  height: 50px;
+  width: 50px;
+  background-repeat: no-repeat;
+}
+
+.calendar-logo {
+  width: 100%;
+  max-height: 50px;
+  margin-top: -13px;
+}
+
+.calendar-btn a {
+  background-color: transparent !important;
+  padding: 13px 0 0 0 !important;
 }

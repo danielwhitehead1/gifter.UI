@@ -16,3 +16,7 @@ code {
 .below_navbar {
   padding-top: 60px;
 }
+
+.no_navbar {
+  margin-top: -60px;
+}

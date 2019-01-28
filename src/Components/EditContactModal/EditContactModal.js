@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
-import { Modal, Button, FormGroup, ControlLabel, FormControl, Form, InputGroup } from 'react-bootstrap';
+import { Modal, Button, FormGroup, ControlLabel, FormControl, Form, InputGroup, Radio } from 'react-bootstrap';
 import LoaderButton from "../LoaderButton/LoaderButton";
 import { API } from 'aws-amplify';
-import { getAPI, postAPI, updateAPI } from '../../lib/apiCall-lib';
+import { postAPI, updateAPI } from '../../lib/apiCall-lib';
+
+const genders = Object.freeze({'male': 1, 'female': 1, 'pnts': 1, 'other': 0});
 
 class EditContactModal extends Component {
   constructor(props) {
     super(props);
     let contact = props.contact;
+    let otherGender = contact.gender ? !genders[contact.gender] : false;
     this.state = {
       firstname: contact.firstname,
       surname: contact.surname,
       gender: contact.gender,
+      otherGender: otherGender,
       keywords: [],
       currentKeyword: '',
       selectedKeyword: '',
@@ -20,29 +24,19 @@ class EditContactModal extends Component {
     }
   }
 
-  gotKeywordsCallback = (tags) => {
-    let keywords = Object.keys(tags).reduce(function (r, k) {
-      return r.concat(tags[k]['tag']);
-    }, []);
-
-    this.setState({
-      keywords: keywords,
-      selectedKeyword: keywords[0]
-    });
-  }
-
   componentDidUpdate(prevProps) {
-    if(this.props.contact !== prevProps.contact) {
+    if(this.props.contact !== prevProps.contact || this.props.keywords !== prevProps.keywords) {
       let contact = this.props.contact;
-      if(contact.firstname !== '') {
-        let body = {'queryStringParameters': { 'contactId': contact.id }};
-        getAPI('tags', this.gotKeywordsCallback, body)
-      }
+      let keywords = this.props.keywords;
+      let selectedKeyword = keywords.length > 0 ? keywords[0] : '';
       this.setState({
         firstname: contact.firstname,
         surname: contact.surname,
+        gender: contact.gender,
+        otherGender: contact.gender ? !genders[contact.gender] : false,
+        keywords: keywords,
+        selectedKeyword: selectedKeyword,
         currentKeyword: '',
-        selectedKeyword: '',
         isLoading: false
       });
     }
@@ -53,6 +47,7 @@ class EditContactModal extends Component {
       firstname: '',
       surname: '',
       gender: '',
+      otherGender: false,
       currentKeyword: '',
       selectedKeyword: '',
       isLoading: false,
@@ -127,6 +122,15 @@ class EditContactModal extends Component {
     });
   }
 
+  handleRadioChange = event => {
+    let otherGender = !genders[event.target.id];
+    let gender = otherGender ? '' : event.target.id;
+    this.setState({
+      gender: gender,
+      otherGender: otherGender
+    });
+  }
+
   handleKeywordAdd = () => {
     let newKeywords = this.state.keywords;
     newKeywords.push(this.state.currentKeyword);
@@ -138,6 +142,13 @@ class EditContactModal extends Component {
       return( this.state.selectedKeyword === keyword ? false : keyword)
     }, this).filter(function(keyword) { return(!!keyword) })
     this.setState({keywords: newKeywords, selectedKeyword: newKeywords[0]});
+  }
+
+  genderActive(gender) {
+    if(this.state.gender === gender) {
+      return(true);
+    }
+    return(false);
   }
 
   createContactButtons() {
@@ -179,7 +190,7 @@ class EditContactModal extends Component {
     )
   }
 
-  addKeywordsField() {
+  renderNewKeywordsField() {
     return(
       <FormGroup controlId="currentKeyword">
         <ControlLabel>New Keyword</ControlLabel>
@@ -197,7 +208,7 @@ class EditContactModal extends Component {
     );
   }
 
-  displayKeywordsField() {
+  renderKeywordsField() {
     return(
       this.state.keywords.length > 0 ?
       <FormGroup controlId="selectedKeyword">
@@ -218,6 +229,41 @@ class EditContactModal extends Component {
         </InputGroup>
       </FormGroup>
        : '');
+  }
+
+  renderGenderField() {
+    return(
+      <div>
+        <ControlLabel>Gender</ControlLabel>
+        <FormGroup controlId="gender" onChange={this.handleRadioChange}>
+          <Radio name="radioGroup" id="male" defaultChecked={this.genderActive('male')} inline>
+            Male
+          </Radio>{' '}
+          <Radio name="radioGroup" id='female' defaultChecked={this.genderActive('female')} inline>
+            Female
+          </Radio>{' '}
+          <Radio name="radioGroup" id='other' defaultChecked={this.state.otherGender} inline>
+            Other
+          </Radio>{'  '}
+          <Radio name="radioGroup" id='pnts' defaultChecked={this.genderActive('pnts')} inline>
+            Prefer not to say
+          </Radio>
+        </FormGroup>
+          {
+            this.state.otherGender ? 
+              <FormGroup controlId='gender' bsSize='small' >
+                <FormControl
+                  type="text"
+                  onChange={this.handleChange}
+                  value={this.state.gender}
+                  placeholder="Please specify"
+                  /> 
+              </FormGroup>  
+              :
+                ''
+          }
+      </div>  
+    )
   }
 
   render() {
@@ -244,8 +290,9 @@ class EditContactModal extends Component {
               value={this.state.surname}
             />
           </FormGroup>
-          {this.addKeywordsField()}
-          {this.displayKeywordsField()}
+          { this.renderGenderField() }
+          { this.renderNewKeywordsField() }
+          { this.renderKeywordsField() }
         </Form>
       </Modal.Body>
       <Modal.Footer>

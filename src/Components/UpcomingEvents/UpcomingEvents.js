@@ -34,10 +34,11 @@ class UpcomingEvents extends Component {
           {this.props.events.map(function(e) {
             return(
               <ListGroupItem 
-                header={e.title} 
+                header={e.title}
                 href='#' 
                 onClick={() => this.props.onClick(e)}
                 key={e.id}
+                className="upcoming-events-tbl"
               >
                 {this.daysToEvent(e.start)}
               </ListGroupItem>);

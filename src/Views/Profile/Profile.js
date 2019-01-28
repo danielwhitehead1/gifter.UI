@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
+import Navbar from './../../Components/Navbar/Navbar';
 
 class Profile extends Component {
   render() {
-    return(      
-      <div className="centered-content">
-        <p>Profile Page</p>
+    return(
+      <div>
+        <Navbar 
+          isAuthenticated={this.props.isAuthenticated}
+          userHasAuthenticated={this.props.userHasAuthenticated}
+        />  
+        <div className="centered-content">
+          <p>Profile Page</p>
+        </div>
       </div>
     );
   }

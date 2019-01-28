@@ -16,7 +16,8 @@ class ContactModal extends Component {
     let keywords = Object.keys(tags).reduce(function (r, k) {
       return r.concat(tags[k]['tag']);
     }, []);
-    this.setState({keywords: keywords, loaded: true})
+    this.setState({keywords: keywords, loaded: true});
+    this.props.onGotTags(keywords);
   }
 
   componentDidUpdate(prevProps) {
@@ -60,10 +61,7 @@ class ContactModal extends Component {
       <div>
         { this.state.keywords ? 
           <div>
-            <FormGroup>
-              <ControlLabel>Suggestions</ControlLabel>
-              <Suggestions keywords={this.state.keywords} contactId={this.props.contact.id || -1}/>
-            </FormGroup>
+            <Suggestions keywords={this.state.keywords} contact={this.props.contact || {}}/>
           </div> : ''}
       </div>
     );

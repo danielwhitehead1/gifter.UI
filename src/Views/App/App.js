@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Routes from './../../Routes/Routes';
-import Navbar from './../../Components/Navbar/Navbar';
 import { Auth } from "aws-amplify";
 import './App.css';
 
@@ -41,10 +40,6 @@ class App extends Component {
     return (
       !this.state.isAuthenticating &&
       <div>
-        <Navbar 
-          isAuthenticated={this.state.isAuthenticated}
-          userHasAuthenticated={this.userHasAuthenticated}
-        />
         <div className="below_navbar">
           <Routes childProps={childProps}/>
         </div>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ContactList from './../../Components/ContactList/ContactList';
 import EditContactModal from './../../Components/EditContactModal/EditContactModal';
 import ContactModal from './../../Components/ContactModal/ContactModal';
+import Navbar from './../../Components/Navbar/Navbar';
 import { Button } from 'react-bootstrap';
 import { getAPI } from './../../lib/apiCall-lib';
 import LoadingIcon from './../../Components/LoadingIcon/LoadingIcon';
@@ -14,6 +15,7 @@ class Contacts extends Component {
       editContactModalOpen: false,
       contactModalOpen: false,
       currentContact: this.blankContact(),
+      currentTags: [],
       contacts: [],
       contactsLoading: true
     }
@@ -48,6 +50,7 @@ class Contacts extends Component {
   onCloseEdit = () => {
     this.setState({
       currentContact: this.blankContact(),
+      currentTags: [],
       editContactModalOpen: false
     })
   }
@@ -55,6 +58,7 @@ class Contacts extends Component {
   onClose = () => {
     this.setState({
       currentContact: this.blankContact(),
+      currentTags: [],
       contactModalOpen: false
     })
   }
@@ -72,38 +76,51 @@ class Contacts extends Component {
       contactModalOpen: true 
     })
   }
+
+  onGotTags = (tags) => {
+    this.setState({currentTags: tags})
+  }
  
   render() {
     return(
-      <div className="centered-content">
-        {
-          this.state.contactsLoading ?
-          <LoadingIcon />
-          :
+      <div>
+        <Navbar 
+            isAuthenticated={this.props.isAuthenticated}
+            userHasAuthenticated={this.props.userHasAuthenticated}
+          />
+        <div className="centered-content">
+          {
+            this.state.contactsLoading ?
+            <LoadingIcon />
+            :
 
-          <ContactList 
-            contacts={this.state.contacts || []}
-            contactClick={this.contactClick}
+            <ContactList 
+              contacts={this.state.contacts || []}
+              contactClick={this.contactClick}
+              />
+          }
+          <EditContactModal 
+            show={this.state.editContactModalOpen} 
+            onClose={this.onCloseEdit} 
+            updateContacts={this.updateContacts}
+            contact={this.state.currentContact}
+            keywords={this.state.currentTags}
             />
-        }
-        <EditContactModal 
-          show={this.state.editContactModalOpen} 
-          onClose={this.onCloseEdit} 
-          updateContacts={this.updateContacts}
-          contact={this.state.currentContact}/>
-        <ContactModal 
-          show={this.state.contactModalOpen} 
-          onClose={this.onClose} 
-          contact={this.state.currentContact}
-          onEdit={this.onEdit}
-          /> 
-        <Button 
-          bsStyle="primary"
-          className="create-btn"
-          onClick={this.addContact}
-        >
-          Add Contact
-        </Button>
+          <ContactModal 
+            show={this.state.contactModalOpen} 
+            onClose={this.onClose} 
+            contact={this.state.currentContact}
+            onGotTags={this.onGotTags}
+            onEdit={this.onEdit}
+            /> 
+          <Button 
+            bsStyle="primary"
+            className="create-btn"
+            onClick={this.addContact}
+          >
+            Add Contact
+          </Button>
+        </div>
       </div>
     )
   }

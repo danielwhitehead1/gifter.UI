@@ -34,6 +34,7 @@ class TopNavbar extends Component {
     return(
       <div>
         <Nav>
+          <NavItem componentClass={Link} href="/calendar" to="/calendar" active={window.location.pathname === '/calendar'}>Calendar</NavItem>
           <NavItem componentClass={Link} href="/contacts" to="/contacts" active={window.location.pathname === '/contacts'}>Contacts</NavItem>
           <NavItem componentClass={Link} href="/profile" to="/profile" active={window.location.pathname === '/profile'}>Profile</NavItem>
         </Nav>

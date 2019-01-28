@@ -6,6 +6,7 @@ import {
   ControlLabel
 } from "react-bootstrap";
 import LoaderButton from "./../../Components/LoaderButton/LoaderButton";
+import Navbar from './../../Components/Navbar/Navbar';
 import "./Signup.css";
 import { Auth } from "aws-amplify";
 
@@ -169,10 +170,16 @@ export default class Signup extends Component {
 
   render() {
     return (
-      <div className="Signup">
-        {this.state.newUser === null
-          ? this.renderForm()
-          : this.renderConfirmationForm()}
+      <div>
+        <Navbar 
+          isAuthenticated={this.props.isAuthenticated}
+          userHasAuthenticated={this.props.userHasAuthenticated}
+        />
+        <div className="Signup">
+          {this.state.newUser === null
+            ? this.renderForm()
+            : this.renderConfirmationForm()}
+        </div>
       </div>
     );
   }

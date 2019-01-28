@@ -7,13 +7,59 @@
 }
 
 .rbc-event {
-  background-color: #a94442;
+  background-color: #CD6155;
 }
 
 .rbc-event.rbc-selected {
-  background-color: #a94442;
+  background-color: #CD6155;
 }
 
 .rbc-day-slot .rbc-event {
-  border-color: #a94442;
+  border-color: #CD6155;
+}
+
+.rbc-btn-group button {
+  border: none;
+}
+
+.rbc-day-bg {
+  background-color: #D7DBDD;
+  border: none !important;
+}
+
+.rbc-day-bg:hover {
+  background-color: #85929E;
+}
+
+.rbc-off-range-bg {
+  background-color: #F8F9F9;
+}
+
+.rbc-month-view {
+  border: none;
+}
+
+.rbc-header {
+  border: none !important;
+  margin-bottom: 5px;
+}
+
+.rbc-month-header {
+  background-color: #F9EBEA;
+}
+
+.rbc-toolbar button.rbc-active {
+  box-shadow: none;
+}
+
+.rbc-date-cell {
+  color: #1C2833;
+}
+
+.rbc-timeslot-group .rbc-time-slot {
+  border: none;
+}
+
+.rbc-time-view {
+  border: none;
 }
