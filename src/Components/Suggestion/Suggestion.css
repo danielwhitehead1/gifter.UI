@@ -4,18 +4,47 @@
   color: white;
 }
 
-.remove-btn {
+.suggestion-img {
+  height: 90px;
+  width: 90px;
+  margin-bottom: 5px;
+  float: left;
+}
+
+.card {
+  margin: 5px;
+  display: flex;
+}
+
+.card-header {
+  background-color: #ffc560;
+  width: 30%;
+  word-break: break-word;
+}
+
+.action-btns {
+  align-self: baseline;
+}
+
+.suggestion-body {
+  margin-bottom: auto;
   float: right;
 }
 
-.favourite-btn {
-  background-color: transparent;
-  border: none;
-  float: right;
-  margin-right: 5px;
+.card-lower-content {
+  display: flex;
+  align-items: center;
 }
 
-.star-img {
-  width: 30px;
-  height: 30px;
+.card-upper-content {
+  display: flex;
+  align-items: center;
+}
+
+.suggestion-link {
+  color: orange;
+}
+
+.suggestion-text {
+  margin-left: 5px;
 }

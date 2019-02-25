@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { Button, ControlLabel, FormGroup } from 'react-bootstrap';
+import { FormGroup, Tab, Tabs} from 'react-bootstrap';
 import Suggestion from './../Suggestion/Suggestion';
 import LoadingIcon from './../../Components/LoadingIcon/LoadingIcon';
 
-import { addSuggestion, removeSuggestion, getNewSuggestion, updateSuggestion, getEvents } from '../../lib/suggestions-lib';
+import { addSuggestion, removeSuggestion, getNewSuggestion, updateSuggestion } from '../../lib/suggestions-lib';
+import { apiCallback } from '../../lib/api_callbacks-lib';
 import { getAPI } from './../../lib/apiCall-lib';
+import { CardDeck } from 'reactstrap';
+import Typography from '@material-ui/core/Typography';
 
 class Suggestions extends Component {
   constructor(props) {
@@ -12,7 +15,9 @@ class Suggestions extends Component {
     this.state = {
       suggestions: [],
       savedSuggestions: [],
-      suggestionsLoading: true
+      similarSuggestions: [],
+      suggestionsLoading: true,
+      key: 'favourites'
     }
   }
 
@@ -21,92 +26,61 @@ class Suggestions extends Component {
     getAPI('suggestions', this.onGotSuggestionsCallback, reqBody);
   }
 
+  getSuggestion() {
+    getNewSuggestion(this.props.keywords, this.props.contact.gender, this.apiSuggestionCallback);
+  }
+
   onGotSuggestionsCallback = (results) => {
     let savedSuggestions = [];
+    let similarSuggestions = [];
     let suggestions = [];
     let result;
     for(result of results) {
-      if(result.saved === '1') {
+      if(result.saved === 1) {
         savedSuggestions.push(result);
+      } else if(result.similarSuggestion === 1) {
+        similarSuggestions.push(result);
       } else {
         suggestions.push(result);
       }
     }
-    this.setState({suggestions: suggestions, savedSuggestions: savedSuggestions, suggestionsLoading: false});
-  }
-
-  formatSuggestion(title, url, id, seller, imgURL) {
-    return({
-      'title': title,
-      'url': url,
-      'itemId': id,
-      'seller': seller,
-      'saved': 0,
-      'imgURL': imgURL
-    })
+    if(results.length < 3) {
+      this.getSuggestion();
+    }
+    this.setState({
+        suggestions: suggestions,
+        savedSuggestions: savedSuggestions,
+        similarSuggestions: similarSuggestions,
+        suggestionsLoading: false
+      });
   }
 
   addItem(item) {
     let items = this.state.suggestions;
     items.push(item);
     this.setState({suggestions: items});
+    if(this.state.suggestions.length < 3) { 
+      this.getSuggestion();
+    }
     addSuggestion(item, this.props.contact.id);
   }
 
-  onSuggestionReturnCallbackEtsy = (err, data) => {
-    if(data.ok) {
-      var item = data.results[0] || [];
-      item = this.formatSuggestion(item.title, item.url, item.listing_id, 'etsy', item.MainImage.url_75x75);
-      this.addItem(item);
+  apiSuggestionCallback = (err, data, source) => {
+    let item = apiCallback(err, data, source);
+    if(item === '') {
+      this.getSuggestion();
     } else {
-      console.log(data);
+      this.addItem(item)
     }
-  }
-
-  onSuggestionReturnCallbackEbay = (err, data) => {
-    if(!err) {
-      if(data.findItemsByKeywordsResponse[0].searchResult[0].item) {
-        var item = data.findItemsByKeywordsResponse[0].searchResult[0].item[0] || [];
-        debugger;
-        item = this.formatSuggestion(item.title, item.viewItemURL[0], item.itemId[0], 'ebay', item.galleryURL[0]);
-        debugger;
-        this.addItem(item);
-      } else {
-        getNewSuggestion(
-          this.props.keywords,
-          this.props.contact.gender,
-          this.onSuggestionReturnCallbackEbay
-        );
-      }
-      // add suggestion to db
-      /*
-       * Item:
-       *   condition => conditionId
-       *   galleryURL 
-       *   location 
-       *   title 
-       *   viewItemURL
-       *   itemId  
-       *   buyerSatisfaction???? 
-       */
-    } else {
-    }
-  }
-
-  onSuggestionReturnCallBackTicketMaster = () => {
-    debugger;
-  }
-
-  onClick = () => {
-    getEvents(this.onSuggestionReturnCallBackTicketMaster);
-    // getNewSuggestion(this.props.keywords, this.props.contact.gender, this.onSuggestionReturnCallbackEbay);
   }
 
   removeSuggestion = (id, seller) => {
     let suggestions = this.state.suggestions;
     let savedSuggestions = this.state.savedSuggestions;
+    let similarSuggestions = this.state.similarSuggestions;
     let newSuggestions = [];
     let newSavedSuggestions = [];
+    let newSimilarSuggestions = [];
     suggestions.forEach(element => {
       if(element.itemId !== id) {
         newSuggestions.push(element);
@@ -117,13 +91,28 @@ class Suggestions extends Component {
         newSavedSuggestions.push(element);
       }
     });
+    similarSuggestions.forEach(element => {
+      if(element.itemId !== id) {
+        newSimilarSuggestions.push(element);
+      }
+    });
     // Remove suggestion from db
     removeSuggestion(id, this.props.contact.id, seller)
-    this.setState({suggestions: newSuggestions, savedSuggestions: newSavedSuggestions});
+    this.setState({suggestions: newSuggestions, savedSuggestions: newSavedSuggestions, similarSuggestions: newSimilarSuggestions});
+    if(newSuggestions.length < 3) { 
+      this.getSuggestion();
+    }
   }
 
   saveSuggestion = (item) => {
-    item.saved = 1;
+    let suggestions = this.updateSuggestion(item, 'saved', 1);
+    if(suggestions.length < 3) { 
+      this.getSuggestion();
+    }
+  }
+
+  updateSuggestion(item, property, value) {
+    item[property] = value
     let suggestions = [];
     let savedSuggestions = this.state.savedSuggestions;
     this.state.suggestions.forEach( e => {
@@ -135,54 +124,101 @@ class Suggestions extends Component {
     })
     updateSuggestion(item, this.props.contact.id);
     this.setState({savedSuggestions: savedSuggestions, suggestions: suggestions});
+    return(suggestions);
   }
 
-  renderSavedSuggestions() {
-    return(
-      <FormGroup>
-        <ControlLabel>Favourites</ControlLabel>        
-        { this.state.savedSuggestions.map(function(item, index) {
-          return(<Suggestion 
-            key={index}
-            item={item}
-            removeSuggestion={this.removeSuggestion}
-            saveSuggestion={this.saveSuggestion}/>);
-          }, this) }
-      </FormGroup>
-    );
+  ratingGiven = (item) => {
+    let suggestions = this.state.suggestions;
+    let savedSuggestions = this.state.savedSuggestions;
+    let similarSuggestions = this.state.similarSuggestions;
+    let newSuggestions = [];
+    let newSavedSuggestions = [];
+    let newSimilarSuggestions = [];
+    suggestions.forEach(element => {
+      if(element.itemId === item.itemId) {
+        element.rated = 1;
+      }
+      newSuggestions.push(element);
+    });
+    savedSuggestions.forEach(element => {
+      if(element.itemId === item.itemId) {
+        element.rated = 1;
+      }
+      newSavedSuggestions.push(element);
+    });
+    similarSuggestions.forEach(element => {
+      if(element.itemId === item.itemId) {
+        element.rated = 1;
+      }
+      newSimilarSuggestions.push(element);
+    });
+    this.setState({suggestions: newSuggestions, savedSuggestions: newSavedSuggestions, similarSuggestions: newSimilarSuggestions});
+    //Set item rating to 1 on the front end
   }
 
-  renderNewSuggestions() {
+  suggestion(item, index) {
+    return(
+      <Suggestion 
+        key={index}
+        item={item}
+        contactId={this.props.contact.id}
+        removeSuggestion={this.removeSuggestion}
+        saveSuggestion={this.saveSuggestion}
+        onRatingGivenCallback={this.ratingGiven}
+        />
+    )
+  }
+
+  renderGroup(suggestions) {
     return(
       <FormGroup>
-        <ControlLabel>Suggestions</ControlLabel>        
-        { this.state.suggestions.map(function(item, index) {
-          return(<Suggestion 
-            key={index}
-            item={item}
-            removeSuggestion={this.removeSuggestion}
-            saveSuggestion={this.saveSuggestion}/>);
-        }, this) }
+        <CardDeck>
+          { suggestions.map(function(item, index) {
+            return(this.suggestion(item, index));
+            }, this) }
+        </CardDeck>
       </FormGroup>
     )
   }
 
   renderSuggestions() {
     return(
-      <div>
-        {
-          this.state.suggestions.length > 0 ?
-            this.renderNewSuggestions()
-            :
-            ''
-        }
+      <Tabs
+        id="controlled-tab-example"
+        activeKey={this.state.key}
+        onSelect={key => this.setState({ key })}
+      >
+        <Tab eventKey="favourites" title="Favourites">
         {
           this.state.savedSuggestions.length > 0 ? 
-            this.renderSavedSuggestions()
+            this.renderGroup(this.state.savedSuggestions)
             :
-            ''
+            <Typography component="h2" variant="display1">
+            Nothing favourited! Click the heart to favourite suggestions.
+            </Typography>
         }
-      </div>
+        </Tab>
+        <Tab eventKey="suggestions" title="Suggestions">
+        {
+          this.state.suggestions.length > 0 ?
+            this.renderGroup(this.state.suggestions)
+            :
+            <Typography component="h2" variant="display1">
+            We're trying hard...
+            </Typography>
+        }
+        </Tab>
+        <Tab eventKey="similar" title="Browse">
+        {
+          this.state.similarSuggestions.length > 0 ?
+            this.renderGroup(this.state.similarSuggestions)
+            :
+            <Typography component="h2" variant="display1">
+            The more you rate and favourite suggestions the more people we can find who are similar! 
+            </Typography>
+        }
+        </Tab>
+      </Tabs>
     );
   }
 
@@ -195,10 +231,6 @@ class Suggestions extends Component {
           :
             this.renderSuggestions()
         }
-        { this.props.keywords ?
-          <div>
-            <Button onClick={this.onClick}>Add Suggestion</Button>
-          </div> : "" }
       </div>
     )
   }

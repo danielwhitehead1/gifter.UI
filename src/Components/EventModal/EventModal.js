@@ -1,13 +1,36 @@
 import React, { Component } from 'react';
 import { Modal, Button, Form, FormGroup, FormControl, ControlLabel, Checkbox } from 'react-bootstrap';
+import LoadingIcon from './../../Components/LoadingIcon/LoadingIcon';
+import Suggestions from './../Suggestions/Suggestions';
+import { getAPI } from '../../lib/apiCall-lib';
 var d3 = require("d3");
 
 class EventModal extends Component {
   constructor(props) {
     super(props)
 
+    this.state = { keywords: [], loaded: false }
+
     this.onClose = this.onClose.bind(this);
     this.onEdit = this.onEdit.bind(this);
+  }
+
+  gotKeywordsCallback = (tags) => {
+    let keywords = Object.keys(tags).reduce(function (r, k) {
+      return r.concat(tags[k]['tag']);
+    }, []);
+    this.setState({keywords: keywords, loaded: true});
+  }
+
+  componentDidUpdate(prevProps) {
+    let contact = this.props.hashedContacts[this.props.event.contactId];
+    if(contact && contact.id !== prevProps.event.contactId) {
+      if(contact.firstname !== '') {
+        let body = {'queryStringParameters': { 'contactId': contact.id }}
+        getAPI('tags', this.gotKeywordsCallback, body);
+      }
+      this.setState({keywords: []});
+    }
   }
 
   onClose() {
@@ -26,7 +49,11 @@ class EventModal extends Component {
 
   showContactName() {
     let contact = this.props.hashedContacts[this.props.event.contactId];
-    return(<p><b>{contact.firstname}</b> {contact.surname}</p>);
+    if(contact) {
+      return(<FormControl.Static><b>{contact.firstname}</b> {contact.surname}</FormControl.Static>);
+    } else {
+      return(<FormControl.Static>No contact added for this event yet!</FormControl.Static>)
+    }
   }
 
   allDayField() {
@@ -54,6 +81,26 @@ class EventModal extends Component {
     );
   }
 
+  renderSuggestions() {
+    let contact = this.props.hashedContacts[this.props.event.contactId];
+    if(contact) {
+      return(<div>{
+        !this.state.loaded ? 
+          <LoadingIcon />
+        : 
+          <Modal.Body>
+            <div>
+              { this.state.keywords ? 
+                <div>
+                  <Suggestions keywords={this.state.keywords} contact={contact || {}}/>
+                </div> : ''}
+            </div>
+          </Modal.Body>
+      }
+      </div>);
+    }
+  }
+
   renderView() {
     return(
       <Modal.Header closeButton>
@@ -62,9 +109,9 @@ class EventModal extends Component {
         </Modal.Title>
         <Modal.Body>
           <Form>
-            <FormGroup >
+            <FormGroup>
               <ControlLabel>Contact</ControlLabel>
-              <FormControl.Static>{ this.contactsAndEventPresent() ? this.showContactName() : ''}</FormControl.Static>
+              { this.contactsAndEventPresent() ? this.showContactName() : ''}
             </FormGroup>
             <FormGroup >
               <ControlLabel>Info</ControlLabel>
@@ -74,7 +121,8 @@ class EventModal extends Component {
               <ControlLabel>Date</ControlLabel>
               <FormControl.Static>{new Date(this.props.event.start).toDateString()}</FormControl.Static>
             </FormGroup>
-            {this.props.event.allDay ? this.allDayField() : this.timeField() }
+            { this.props.event.allDay ? this.allDayField() : this.timeField() }
+            { this.contactsAndEventPresent() ? this.renderSuggestions(): '' }
           </Form>
         </Modal.Body>
       </Modal.Header>

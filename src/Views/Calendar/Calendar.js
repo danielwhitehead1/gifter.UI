@@ -28,8 +28,8 @@ class Calendar extends Component {
   }
   
   componentDidMount() {
-    getAPI('events', this.gotEventsCallback);
-    getAPI('contacts', this.gotContactsCallback);
+    getAPI('events', this.gotEventsCallback, {}, this.gotEventsError);
+    getAPI('contacts', this.gotContactsCallback, {}, this.gotContactsError);
   }
 
   gotContactsCallback = (contacts) => {
@@ -44,6 +44,16 @@ class Calendar extends Component {
       hashedContacts: hashedContacts,
       loadingContacts: false
     });
+  }
+
+  gotContactsError = (error) => {
+    console.log(error);
+    getAPI('contacts', this.gotContactsCallback, {}, this.gotContactsError);
+  }
+
+  gotEventsError = (error) => {
+    console.log(error);
+    getAPI('events', this.gotEventsCallback, {}, this.gotEventsError);
   }
 
   gotEventsCallback = (events) => {
@@ -95,7 +105,7 @@ class Calendar extends Component {
   }
   
   updateCalendar = () => {
-    getAPI('events', this.gotEventsCallback);
+    getAPI('contacts', this.gotContactsCallback, {}, this.gotContactsError);
   }
 
   blankEvent() {

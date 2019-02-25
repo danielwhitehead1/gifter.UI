@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import LandingPage from './../Landing/Landing';
 import Navbar from './../../Components/Navbar/Navbar';
+import { Button } from 'react-bootstrap';
+// import { initClient } from './../../lib/google_calendar-lib.js';
 
 class Home extends Component {
   render() {
@@ -8,10 +10,14 @@ class Home extends Component {
       <div>
       {
         this.props.isAuthenticated ?
-        <Navbar 
-          isAuthenticated={this.props.isAuthenticated}
-          userHasAuthenticated={this.props.userHasAuthenticated}
-        />
+        <div>
+          <Navbar 
+            isAuthenticated={this.props.isAuthenticated}
+            userHasAuthenticated={this.props.userHasAuthenticated}
+          />
+          {/* <Button onClick={initClient}>Authorise</Button>  */}
+        </div>
+
         :
          <LandingPage />
       }

@@ -4,6 +4,7 @@ import Amplify from 'aws-amplify';
 import { BrowserRouter as Router } from 'react-router-dom';
 import config from './config';
 import './index.css';
+import 'react-notifications/lib/notifications.css';
 import App from './Views/App/App';
 import * as serviceWorker from './serviceWorker';
 

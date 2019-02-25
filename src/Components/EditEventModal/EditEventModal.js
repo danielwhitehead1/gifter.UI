@@ -5,6 +5,7 @@ import DateTime from 'react-datetime';
 import { API } from 'aws-amplify';
 import Select from 'react-select';
 import { postAPI, updateAPI } from './../../lib/apiCall-lib';
+import notification from '../../lib/notification-lib';
 
 import 'react-datetime/css/react-datetime.css';
 import './EditEventModal.css';
@@ -92,7 +93,6 @@ class EditEventModal extends Component {
     return(
       this.state.date.length > 0 &&
       this.state.title.length > 0 &&
-      this.state.contactId !== '' &&
       (this.state.allDayEvent || 
         (startHour < endHour) || 
         ((startHour === endHour) && startMinute < endMinute))
@@ -134,7 +134,7 @@ class EditEventModal extends Component {
   getLabel() {
     let contacts = this.props.hashedContacts;
     let id = this.state.contactId;
-    if(Object.keys(contacts).length > 0 && id !== ''){
+    if(Object.keys(contacts).length > 0 && id && id !== ''){
      return(
         {
           value: id, 
@@ -147,12 +147,12 @@ class EditEventModal extends Component {
   eventSuccesCallback = () => {
     this.props.updateCalendar();
     this.closeModal();
-    alert("Success");
+    notification('success', 'Event', 'created');
   }
 
   eventErrorCallback = () => {
     this.closeModal();
-    alert("Something went wrong");
+    notification('error', 'Event', 'created');
   }
 
   createEvent() {
@@ -176,10 +176,10 @@ class EditEventModal extends Component {
     API.del("prod-gifter-api", "/events", body ).then( response => {
       this.props.updateCalendar();
       this.closeModal();
-      alert("Event deleted successfully")
+      notification('success', 'Event', 'deleted');
     }).catch(error => {
       this.closeModal();
-      alert("Something went wrong")
+      notification('error', 'Event', 'deleted');
     });
 
   }
@@ -270,7 +270,7 @@ class EditEventModal extends Component {
     return(
       <Modal show={this.props.show} disabled={this.state.isDeleting}>
       <Modal.Header>
-        <Modal.Title>{this.props.event.title === "" ? "Update Event" : "Create Event"}</Modal.Title>
+        <Modal.Title>{this.props.event.title !== "" ? "Update Event" : "Create Event"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <FormGroup controlId="title" bsSize="large">

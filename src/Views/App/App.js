@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Routes from './../../Routes/Routes';
+import { NotificationContainer } from 'react-notifications'
 import { Auth } from "aws-amplify";
 import './App.css';
 
@@ -41,6 +42,7 @@ class App extends Component {
       !this.state.isAuthenticating &&
       <div>
         <div className="below_navbar">
+          <NotificationContainer />
           <Routes childProps={childProps}/>
         </div>
       </div>

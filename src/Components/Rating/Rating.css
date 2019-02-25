@@ -1,0 +1,8 @@
+.rating {
+  border: none;
+  float: right;
+  margin-left: 10px;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+}

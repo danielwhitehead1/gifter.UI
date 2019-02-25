@@ -27,4 +27,4 @@ yarn-error.log*
 
 aws-exports.js
 rds_credentials.txt
-credentials.json
+credentials.js

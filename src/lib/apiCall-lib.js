@@ -4,7 +4,7 @@ export function postAPI(path, body, callback, errorCallback) {
   try {
     Auth.currentAuthenticatedUser()
     .then(() => {   
-      API.post("prod-gifter-api", `/${path}`, body).then(callback);
+      API.post("prod-gifter-api", `/${path}`, body).then(callback).catch(errorCallback);
     })
     .catch(errorCallback);
   } catch (e) {
@@ -12,11 +12,11 @@ export function postAPI(path, body, callback, errorCallback) {
   }
 }
 
-export function getAPI(path, callback, body) {
+export function getAPI(path, callback, body, errorCallback) {
   try {
     Auth.currentAuthenticatedUser()
     .then(() => {   
-      API.get("prod-gifter-api", `/${path}`, body).then(callback);
+      API.get("prod-gifter-api", `/${path}`, body).then(callback).catch(errorCallback);
     })
     .catch(err => console.log(err));
   } catch (e) {

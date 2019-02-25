@@ -3,6 +3,7 @@ import { Modal, Button, FormGroup, ControlLabel, FormControl, Form, InputGroup, 
 import LoaderButton from "../LoaderButton/LoaderButton";
 import { API } from 'aws-amplify';
 import { postAPI, updateAPI } from '../../lib/apiCall-lib';
+import notification from '../../lib/notification-lib';
 
 const genders = Object.freeze({'male': 1, 'female': 1, 'pnts': 1, 'other': 0});
 
@@ -82,12 +83,12 @@ class EditContactModal extends Component {
   createdContactCallback = () => {
     this.props.updateContacts();
     this.closeModal();
-    alert("Success")
+    notification('success', 'Contact', 'created');
   }
 
   errorCallback = () => {
     this.closeModal();
-    alert("Something went wrong");
+    notification('error', 'Contact', 'created');
   }
 
   createContact = () => {
@@ -109,10 +110,10 @@ class EditContactModal extends Component {
     API.del("prod-gifter-api", "/contacts", reqBody).then( response => {
       this.props.updateContacts();
       this.closeModal();
-      alert("Contact deleted successfully")
+      notification('success', 'Contact', 'deleted');
     }).catch(error => {
       this.closeModal();
-      alert("Something went wrong")
+      notification('error', 'Contact', 'created');
     });
   }
 

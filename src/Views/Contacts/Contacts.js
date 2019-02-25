@@ -22,11 +22,16 @@ class Contacts extends Component {
   }
 
   componentDidMount() {
-    getAPI('contacts', this.onGotContactsCallback);
+    getAPI('contacts', this.onGotContactsCallback, {}, this.gotContactsError);
   }
 
   onGotContactsCallback = (contacts) => {
     this.setState({ contacts: contacts, contactsLoading: false });
+  }
+
+  gotContactsError = (error) => {
+    console.log(error);
+    getAPI('contacts', this.onGotContactsCallback, {}, this.gotContactsError);
   }
 
   blankContact() {
@@ -40,7 +45,7 @@ class Contacts extends Component {
   }
 
   updateContacts = () => {
-    getAPI('contacts', this.onGotContactsCallback);
+    getAPI('contacts', this.onGotContactsCallback, {}, this.gotContactsError);
   }
 
   addContact = () => {
