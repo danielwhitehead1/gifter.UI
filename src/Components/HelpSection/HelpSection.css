@@ -1,0 +1,25 @@
+.help-heading {
+  padding-top: 14px;
+}
+
+.help-body1 {
+  font-size: 15px;
+}
+
+.expansion-panels {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.expansion-body {
+  font-size: 15px;
+}
+
+.expansion-details {
+  flex-direction: column;
+}
+
+.expansion-details h4 {
+  padding-bottom: 7px;
+}

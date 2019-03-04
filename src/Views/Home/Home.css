@@ -1,0 +1,23 @@
+.welcome-jumbotron {
+  background-color: white;
+}
+
+.help-section {
+  padding-bottom: 15px;
+}
+
+.carousel-container {
+  max-width: 900px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 15px;
+}
+
+.home-text {
+  font-size: 15px;
+}
+
+.help-link {
+  color: orange;
+}
