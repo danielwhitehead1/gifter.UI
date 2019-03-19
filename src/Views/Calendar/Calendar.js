@@ -106,6 +106,7 @@ class Calendar extends Component {
   
   updateCalendar = () => {
     getAPI('contacts', this.gotContactsCallback, {}, this.gotContactsError);
+    getAPI('events', this.gotEventsCallback, {}, this.gotEventsError);
   }
 
   blankEvent() {
