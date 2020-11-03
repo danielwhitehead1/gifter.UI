@@ -13,3 +13,6 @@ It will keep track of events and give suggestions for what to buy.
 This project comes from personal experience in buying and recieving gifts. It is a hard task and hopefully this application can help to take some of the strain.
 
 3rd Year Project by Daniel Whitehead
+
+# Disclaimer
+*Written with little programming experience*
